@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FaceFusion v4 - WreckUI</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+	<div class="brand">
+		<svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true">
+			<rect x="1.5" y="1.5" width="21" height="21" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+			<circle cx="9" cy="10" r="2.4" fill="currentColor"/>
+			<path d="M13.5 8.2c1.2-1 3-1.1 4.2-.2M14 14.8c1.6 1.4 3.6 1.5 5 .4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+			<path d="M6 16.5c1-1.6 2.2-2.4 3.6-2.4s2.4.7 3.2 1.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+		</svg>
+		<div class="brand-text">
+			<span class="brand-name">FaceFusion</span>
+			<span class="brand-sub">v4 WreckUI</span>
+		</div>
+	</div>
+
+	<div class="telemetry" id="telemetry" aria-label="System metrics">
+		<span class="telemetry-empty" id="telemetryEmpty">telemetry off</span>
+	</div>
+
+	<div class="topbar-right">
+		<div class="session-chip" id="sessionChip" title="Session time to live">
+			<span class="dot dot-idle" id="connDot"></span>
+			<span id="connLabel">offline</span>
+			<span class="session-ttl mono" id="sessionTtl" hidden>--:--</span>
+		</div>
+		<button class="btn btn-ghost" id="btnSettings" aria-label="Connection settings" title="Connection settings">
+			<svg viewBox="0 0 24 24" class="icon"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.24.6.83 1 1.51 1H21a2 2 0 1 1 0 4h-.09c-.68 0-1.27.4-1.51 1Z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+		</button>
+		<button class="btn btn-ghost" id="btnDisconnect" hidden>Disconnect</button>
+	</div>
+</header>
+
+<div class="workspace">
+
+	<!-- ══ Left rail: pipeline options ══ -->
+	<aside class="rail rail-left" aria-label="Pipeline options">
+		<div class="rail-head">
+			<h2>Pipeline</h2>
+			<span class="sync-state" id="syncState" title="Session state sync"></span>
+		</div>
+
+		<div class="processors-block">
+			<div class="block-label">Processors <span class="block-hint">run order</span></div>
+			<div class="chips" id="processorChips" role="group" aria-label="Processors"></div>
+		</div>
+
+		<input type="search" class="option-filter" id="optionFilter" placeholder="Filter options…" aria-label="Filter options">
+
+		<div class="options-groups" id="optionsGroups">
+			<div class="options-placeholder" id="optionsPlaceholder">
+				Options load from <span class="mono">/capabilities</span> once the API is reachable.
+			</div>
+		</div>
+	</aside>
+
+	<!-- ══ Center stage ══ -->
+	<main class="stage">
+		<nav class="tabs" role="tablist">
+			<button class="tab is-active" id="tabBtnBatch" role="tab" aria-selected="true" data-tab="batch">Batch job</button>
+			<button class="tab" id="tabBtnStream" role="tab" aria-selected="false" data-tab="stream">Live stream</button>
+		</nav>
+
+		<!-- Batch -->
+		<section id="tabBatch" role="tabpanel">
+			<div class="io-grid">
+				<div class="io-block">
+					<div class="io-head">
+						<span>Source <span class="io-hint">faces to take</span></span>
+						<button class="btn btn-mini btn-ghost" id="btnSourceFaces" hidden>Faces</button>
+					</div>
+					<div class="dropzone" id="zoneSource" tabindex="0" role="button" aria-label="Upload source images or videos">
+						<input type="file" id="inputSource" accept="image/*,video/*" multiple hidden>
+						<div class="dropzone-empty" id="sourceEmpty">
+							<svg viewBox="0 0 24 24" class="icon icon-lg"><path d="M12 16V4m0 0 4 4m-4-4L8 8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+							<p>Drop source images<br><span>or click to browse — multiple allowed</span></p>
+						</div>
+						<div class="asset-thumbs" id="sourceThumbs"></div>
+						<div class="dropzone-loading" id="sourceLoading" hidden><span class="spinner"></span>Uploading…</div>
+					</div>
+				</div>
+
+				<div class="io-arrow" aria-hidden="true">
+					<svg viewBox="0 0 24 24" class="icon"><path d="M4 12h15m0 0-5-5m5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+				</div>
+
+				<div class="io-block">
+					<div class="io-head">
+						<span>Target <span class="io-hint">where faces go</span></span>
+						<button class="btn btn-mini btn-ghost" id="btnTargetFaces" hidden>Faces</button>
+					</div>
+					<div class="dropzone" id="zoneTarget" tabindex="0" role="button" aria-label="Upload target image or video">
+						<input type="file" id="inputTarget" accept="image/*,video/*" hidden>
+						<div class="dropzone-empty" id="targetEmpty">
+							<svg viewBox="0 0 24 24" class="icon icon-lg"><path d="M12 16V4m0 0 4 4m-4-4L8 8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+							<p>Drop target image or video<br><span>or click to browse</span></p>
+						</div>
+						<div class="asset-thumbs" id="targetThumbs"></div>
+						<div class="dropzone-loading" id="targetLoading" hidden><span class="spinner"></span>Uploading…</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="runbar">
+				<button class="btn btn-primary btn-run" id="btnRun" disabled>
+					<svg viewBox="0 0 24 24" class="icon"><path d="M7 4.8v14.4c0 .9 1 1.5 1.8 1L20 13a1.2 1.2 0 0 0 0-2L8.8 3.9c-.8-.5-1.8 0-1.8 1Z" fill="currentColor"/></svg>
+					Run pipeline
+				</button>
+				<span class="runbar-hint" id="runHint">Connect to the API, then add a target.</span>
+			</div>
+
+			<div class="output-stage">
+				<div class="output-head">
+					<span>Output</span>
+					<div class="output-tools">
+						<div class="view-switch" id="viewSwitch" hidden>
+							<button class="view-btn is-active" id="viewResult">Result</button>
+							<button class="view-btn" id="viewCompare">Compare</button>
+						</div>
+						<a class="btn btn-mini btn-ghost" id="btnDownload" hidden download>
+							<svg viewBox="0 0 24 24" class="icon"><path d="M12 4v12m0 0 4-4m-4 4-4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+							Download
+						</a>
+					</div>
+				</div>
+				<div class="output-canvas" id="outputCanvas">
+					<div class="output-empty" id="outputEmpty">
+						<p>Processed media lands here.</p>
+						<p class="output-empty-sub" id="outputEmptySub">Source + target → run → result.</p>
+					</div>
+					<div class="output-progress" id="outputProgress" hidden>
+						<span class="spinner spinner-lg"></span>
+						<div class="output-progress-text">
+							<strong id="jobPhase">Queued</strong>
+							<span id="jobDetail" class="mono">—</span>
+						</div>
+					</div>
+					<img id="outputImage" class="output-media" hidden alt="Processed result">
+					<video id="outputVideo" class="output-media" hidden controls loop></video>
+					<div class="compare-wrap" id="compareWrap" hidden>
+						<img id="compareBase" alt="Target before processing">
+						<div class="compare-top" id="compareTopWrap"><img id="compareTop" alt="Processed result"></div>
+						<input type="range" class="compare-slider" id="compareSlider" min="0" max="100" value="50" aria-label="Compare target and result">
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Live stream -->
+		<section id="tabStream" role="tabpanel" hidden>
+			<div class="stream-controls">
+				<button class="btn btn-primary" id="btnStreamStart">
+					<svg viewBox="0 0 24 24" class="icon"><path d="M15 10.5 19.5 7v10L15 13.5M4 7h9a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+					Start webcam
+				</button>
+				<button class="btn" id="btnStreamImage">Send an image</button>
+				<input type="file" id="inputStreamImage" accept="image/*" hidden>
+				<button class="btn btn-ghost" id="btnStreamStop" hidden>Stop</button>
+				<span class="stream-fps mono" id="streamFps"></span>
+				<span class="stream-note">Uses the selected source and pipeline options.</span>
+			</div>
+			<div class="stream-grid">
+				<div class="stream-pane">
+					<div class="stream-pane-label">Camera in</div>
+					<video id="streamInput" class="stream-media" muted playsinline></video>
+					<div class="stream-empty" id="streamInputEmpty">webcam off</div>
+				</div>
+				<div class="stream-pane">
+					<div class="stream-pane-label">Processed out</div>
+					<img id="streamOutput" class="stream-media" alt="Processed stream" hidden>
+					<div class="stream-empty" id="streamOutputEmpty">no frames yet</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<!-- ══ Right rail: jobs ══ -->
+	<aside class="rail rail-right" aria-label="Jobs">
+		<div class="rail-head">
+			<h2>Jobs</h2>
+			<button class="btn btn-mini btn-ghost" id="btnJobsRefresh" aria-label="Refresh jobs" title="Refresh jobs">
+				<svg viewBox="0 0 24 24" class="icon"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 3v4h-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+			</button>
+		</div>
+		<div class="jobs-list" id="jobsList">
+			<div class="jobs-empty" id="jobsEmpty">No jobs yet.<br>Run the pipeline to create one.</div>
+		</div>
+	</aside>
+</div>
+
+<!-- Settings modal -->
+<div class="modal-backdrop" id="settingsModal" hidden>
+	<div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+		<div class="modal-head">
+			<h3 id="settingsTitle">Connection</h3>
+			<button class="btn btn-ghost btn-mini" id="btnSettingsClose" aria-label="Close settings">✕</button>
+		</div>
+		<div class="modal-body">
+			<label class="field">
+				<span class="field-label">API base URL</span>
+				<input type="text" id="cfgUrl" spellcheck="false" placeholder="http://127.0.0.1:8000">
+			</label>
+			<label class="field">
+				<span class="field-label">API key <span class="field-hint">only when FACEFUSION_API_KEY is set on the server</span></span>
+				<input type="password" id="cfgKey" autocomplete="off" placeholder="leave empty if unset">
+			</label>
+			<label class="field field-check">
+				<input type="checkbox" id="cfgRemember">
+				<span>Remember API key in this browser</span>
+			</label>
+		</div>
+		<div class="modal-foot">
+			<button class="btn btn-primary" id="btnConnect">Connect</button>
+		</div>
+	</div>
+</div>
+
+<!-- Faces modal -->
+<div class="modal-backdrop" id="facesModal" hidden>
+	<div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="facesTitle">
+		<div class="modal-head">
+			<h3 id="facesTitle">Detected faces</h3>
+			<button class="btn btn-ghost btn-mini" id="btnFacesClose" aria-label="Close">✕</button>
+		</div>
+		<div class="modal-body modal-body-center">
+			<span class="spinner spinner-lg" id="facesLoading"></span>
+			<img id="facesImage" hidden alt="Detected faces strip">
+		</div>
+	</div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="app.js" defer></script>
+</body>
+</html>

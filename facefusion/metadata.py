@@ -4,7 +4,7 @@ METADATA =\
 {
 	'name': 'FaceFusion',
 	'description': 'Industry leading face manipulation platform',
-	'version': 'v4',
+	'version': 'WreckUI',
 	'license': 'OpenRAIL-AS',
 	'author': 'Henry Ruhs',
 	'url': 'https://facefusion.io'
