@@ -8,6 +8,10 @@ By DJHanceNL
 
 | Functions | Status                        
 |-------|-------------------------------
+
+https://github.com/user-attachments/assets/aae433a5-3f30-4c35-86ba-7bfb03524227
+
+
 | 1st   |                          
 | 2nd   |    
 | 3rd   |  
@@ -15,6 +19,10 @@ By DJHanceNL
 
 
 
+
+
+
+https://github.com/user-attachments/assets/47f4b44d-f11c-4911-b7e6-d4a4e372748d
 
 
 
